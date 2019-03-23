@@ -72,7 +72,7 @@ class App extends Component {
     this.firebaseRef.child(todoList[selected].id).update({title: todoTitle, text: todoText}, err => {
       if (!err) this.setState({saved: true});
     });
-  }, 2000);
+  }, 1500);
   
   // This is triggered when the "Add New Todo" button is clicked.
   handleCreate(e) {
@@ -124,7 +124,7 @@ class App extends Component {
                     {todoList ? Object.entries(todoList).map(([index, item]) => {
                       index = Number.parseInt(index);
                       return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                        <button className="date" onClick={() => this.select(index)}>{item.value.title}</button>
+                        <button className="date" onClick={() => this.select(index)}>{selected === index ? todoTitle : item.value.title}</button>
                         <button className="delete" onClick={() => this.delete(item.id)}>X</button>
                       </div>
                     }) : null}

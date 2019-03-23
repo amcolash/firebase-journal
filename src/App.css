@@ -50,6 +50,7 @@ h3 {
   right: 1em;
   width: 2em;
   height: 2em;
+  color: #333;
   background-color: #eee;
   font-size: 1em;
   line-height: 0;
@@ -60,8 +61,7 @@ h3 {
 }
 
 .button:hover {
-  color: #333;
-  background-color: #bbb;
+  background-color: white;
 }
 
 .title {
