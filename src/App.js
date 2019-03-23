@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import moment from 'moment';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faLongArrowAltDown, faMoon, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown, faMoon, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import firebase from './firebase.js';
 import './App.css';
 
@@ -17,7 +17,8 @@ class App extends Component {
       selected: 0,
       saved: true,
       initialLoad: true,
-      darkMode: true
+      darkMode: true,
+      fullscreen: false
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -121,7 +122,7 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode } = this.state;
+    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode, fullscreen } = this.state;
 
     return (
       <div className={"App" + (darkMode ? "" : " inverted")}>
@@ -157,8 +158,19 @@ class App extends Component {
                     }) : null}
                   </div>
                   <div className="footer">
-                    <button className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !this.state.darkMode})}>
+                    <button className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !darkMode})}>
                       <FontAwesomeIcon icon={faMoon}/>
+                    </button>
+                    <button className={"button" + (fullscreen ? " selected" : "")} onClick={() => {
+                      if (fullscreen) {
+                        document.exitFullscreen();
+                      } else {
+                        document.documentElement.requestFullscreen();
+                      }
+
+                      this.setState({fullscreen: !fullscreen});
+                    }}>
+                      <FontAwesomeIcon icon={fullscreen ? faCompressArrowsAlt : faExpandArrowsAlt}/>
                     </button>
                   </div>
                 </div>
