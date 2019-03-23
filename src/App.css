@@ -1,18 +1,23 @@
-body {
-  background-color: #282c34;
-}
-
 h3 {
   margin: 0.5em;
 }
 
 .App {
+  background-color: #282828;
   text-align: center;
   display: flex;
   justify-content: center;
   font-size: calc(1em + 0.5vw);
   color: white;
   height: calc(100vh);
+}
+
+.inverted {
+  filter: invert(100%);
+}
+
+.specialInverted {
+  filter: invert(80%);
 }
 
 .noNotes {
@@ -44,14 +49,14 @@ h3 {
   animation: glow 2s alternate infinite ease-in-out;
 }
 
-.button {
+.circle {
   position: absolute;
   bottom: 1em;
   right: 1em;
   width: 2em;
   height: 2em;
-  color: #333;
-  background-color: #eee;
+  color: #555;
+  background-color: #aaa;
   font-size: 1em;
   line-height: 0;
   border: 0;
@@ -60,8 +65,9 @@ h3 {
   transition: all 0.3s;
 }
 
-.button:hover {
+.circle:hover {
   background-color: white;
+  color: #222;
 }
 
 .title {
@@ -92,13 +98,13 @@ h3 {
 }
 
 .left {
-  overflow-y: auto;
+  overflow: hidden;
   flex: 0 0 14em;
-  padding: 0.25em;
-  border-right: 1px solid #999;
 }
 
 .right {
+  border-left: 1px solid #999;
+  margin-left: 0.25em;
   overflow-y: hidden;
   width: 100%;
 }
@@ -116,6 +122,15 @@ h3 {
   resize: none;
 }
 
+.dates {
+  overflow-y: auto;
+  height: calc(100vh - 2.5em);
+}
+
+.footer {
+  border-top: 1px solid #555;
+}
+
 .item {
   display: flex;
 }
@@ -130,11 +145,7 @@ h3 {
   font-size: 0.5em;
 }
 
-.selected .date {
-  background-color: #5a5a5a;
-}
-
-.date, .delete {
+.button {
   padding: 0.5em;
   margin: 0.3em;
   background-color: #444;
@@ -150,7 +161,11 @@ h3 {
   line-height: 0.8;
 }
 
-.date:hover {
+.selected {
+  background-color: #666;
+}
+
+.button:hover {
   background-color: #777;
 }
 

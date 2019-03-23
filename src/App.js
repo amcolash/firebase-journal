@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import moment from 'moment';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faLongArrowAltDown, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faLongArrowAltDown, faMoon, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import firebase from './firebase.js';
 import './App.css';
 
@@ -16,7 +16,8 @@ class App extends Component {
       itemText: '',
       selected: 0,
       saved: true,
-      initialLoad: true
+      initialLoad: true,
+      darkMode: true
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -103,18 +104,26 @@ class App extends Component {
   }
 
   select(index) {
-    const { selected, itemList, itemText } = this.state;
+    const { selected, itemList, itemText, itemTitle, saved } = this.state;
 
+    // Save unsaved changes on select of new item
     this.updateData.clear();
-    this.firebaseRef.child(itemList[selected].id).update({text: itemText});
-    this.setState({selected: index, itemText: itemList[index].value.text});
+    if (!saved) {
+      this.firebaseRef.child(itemList[selected].id).update({
+        title: itemTitle,
+        text: itemText,
+        updated: new Date().getTime()
+      });
+    }
+
+    this.setState({selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true});
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, itemTitle, itemText } = this.state;
+    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode } = this.state;
 
     return (
-      <div className="App">
+      <div className={"App" + (darkMode ? "" : " inverted")}>
         {initialLoad ? null : (
           <Fragment>
             {itemList.length === 0 ? (
@@ -133,16 +142,23 @@ class App extends Component {
                     {itemList ? Object.entries(itemList).map(([index, item]) => {
                       index = Number.parseInt(index);
                       return (
-                        <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                          <button className="date" onClick={() => this.select(index)}>
+                        <div className="item" key={index}>
+                          <button className={"button date" + (selected === index ? " selected" : "")} onClick={() => this.select(index)}>
                             {selected === index ? itemTitle : item.value.title}
                             <br/>
                             <span className="updated">{moment(item.value.updated).fromNow()}</span>
                           </button>
-                          <button className="delete" onClick={() => this.delete(item.id)}><FontAwesomeIcon icon={faTrash} /></button>
+                          <button className={"button delete" + (darkMode ? "" : " inverted")} onClick={() => this.delete(item.id)}>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
                         </div>
                       )
                     }) : null}
+                  </div>
+                  <div className="footer">
+                    <button className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !this.state.darkMode})}>
+                      <FontAwesomeIcon icon={faMoon}/>
+                    </button>
                   </div>
                 </div>
         
@@ -150,8 +166,7 @@ class App extends Component {
                   <div>
                     <h3>
                       <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
-                      {/* <span className={"saved" + (saved ? "" : " hidden")}></span> */}
-                      <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden")} />
+                      <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden") + (darkMode ? "" : " specialInverted")} />
                     </h3>
                   </div>
                   <textarea value={itemText} onChange={this.handleTextChange}/>
@@ -159,7 +174,7 @@ class App extends Component {
               </Fragment>
             )}
   
-            <button className={"button" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
+            <button className={"circle" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
               <FontAwesomeIcon icon={faPlus}/>
             </button>
           </Fragment>
