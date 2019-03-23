@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import moment from 'moment';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faLongArrowAltDown, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
@@ -36,7 +37,7 @@ class App extends Component {
       }
 
       const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
-        return b.value.date - a.value.date;
+        return b.value.created - a.value.created;
       });
 
       const selected = Math.min(this.state.selected, itemList.length - 1);
@@ -71,7 +72,11 @@ class App extends Component {
   
   updateData = debounce(() => {
     const { selected, itemList, itemTitle, itemText } = this.state;
-    this.firebaseRef.child(itemList[selected].id).update({title: itemTitle, text: itemText}, err => {
+    this.firebaseRef.child(itemList[selected].id).update({
+      title: itemTitle,
+      text: itemText,
+      updated: new Date().getTime()
+    }, err => {
       if (!err) this.setState({saved: true});
     });
   }, 1500);
@@ -80,9 +85,11 @@ class App extends Component {
   handleCreate(e) {
     if (e) e.preventDefault();
     // Add the new item to Firebase.
+    const now = new Date();
     this.firebaseRef.push({
-      date: new Date().getTime(),
-      title: new Date().toLocaleString(),
+      created: now.getTime(),
+      updated: now.getTime(),
+      title: now.toLocaleString(),
       text: '...',
     }, err => {
       if (!err) {
@@ -125,10 +132,16 @@ class App extends Component {
                   <div className="dates">
                     {itemList ? Object.entries(itemList).map(([index, item]) => {
                       index = Number.parseInt(index);
-                      return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                        <button className="date" onClick={() => this.select(index)}>{selected === index ? itemTitle : item.value.title}</button>
-                        <button className="delete" onClick={() => this.delete(item.id)}><FontAwesomeIcon icon={faTrash} /></button>
-                      </div>
+                      return (
+                        <div className={"item" + (selected === index ? " selected" : "")} key={index}>
+                          <button className="date" onClick={() => this.select(index)}>
+                            {selected === index ? itemTitle : item.value.title}
+                            <br/>
+                            <span className="updated">{moment(item.value.updated).fromNow()}</span>
+                          </button>
+                          <button className="delete" onClick={() => this.delete(item.id)}><FontAwesomeIcon icon={faTrash} /></button>
+                        </div>
+                      )
                     }) : null}
                   </div>
                 </div>
