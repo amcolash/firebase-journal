@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { debounce } from "debounce";
 import firebase from './firebase.js';
 import './App.css';
@@ -11,7 +11,8 @@ class App extends Component {
       todoList: {}, // Mirrors the Todo list in Firebase.
       todoText: '', // Mirrors the new Todo Text field in the UI.
       selected: 0,
-      saved: true
+      saved: true,
+      initialLoad: true
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -26,7 +27,7 @@ class App extends Component {
       const values = snap.val();
 
       if (!values) {
-        this.handleSubmit();
+        this.setState({todoList: [], initialLoad: false});
         return;
       }
 
@@ -34,10 +35,10 @@ class App extends Component {
         return b.value.date - a.value.date;
       });
 
-      const selected = Math.min(this.state.selected, todoList.length);
+      const selected = Math.min(this.state.selected, todoList.length - 1);
       const todoText = todoList[selected] ? todoList[selected].value.text : '';
 
-      this.setState({ todoList: todoList || [], selected: selected || 0, todoText: todoText || '' });
+      this.setState({ todoList: todoList || [], selected: selected || 0, todoText: todoText || '', initialLoad: false });
     });
   }
   
@@ -74,34 +75,59 @@ class App extends Component {
   }
 
   select(index) {
-    this.setState({selected: index, todoText: this.state.todoList[index].value.text});
+    const { selected, todoList, todoText } = this.state;
+
+    this.updateData.clear();
+    this.firebaseRef.child(todoList[selected].id).update({text: todoText});
+    this.setState({selected: index, todoText: todoList[index].value.text});
   }
 
   render() {
-    const { saved, selected, todoList, todoText } = this.state;
+    const { initialLoad, saved, selected, todoList, todoText } = this.state;
 
     return (
       <div className="App">
-        <div className="column left">
-          <div className="dates">
-            {todoList ? Object.entries(todoList).map(([index, item]) => {
-              index = Number.parseInt(index);
-              const date = new Date(item.value.date).toLocaleString();
-              return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                <div className="date" onClick={() => this.select(index)}>{date}</div>
-                <div className="delete" onClick={() => this.delete(item.id)}>X</div>
+        {initialLoad ? null : (
+          <Fragment>
+            {todoList.length === 0 ? (
+              <div className="noNotes">
+                <h2>
+                  You don't have any notes yet.
+                  <br/>
+                  Click the plus button to get started.
+                </h2>
+                <div className="icon">⬇</div>
               </div>
-            }) : null}
-          </div>
-        </div>
-
-        <div className="column right">
-          <textarea value={todoText} onChange={this.handleChange}/>
-        </div>
-
-        <div className={"saved" + (saved ? "" : " hidden")}>✓</div>
-
-        <button className="button" onClick={this.handleSubmit}>+</button>
+            ) : (
+              <Fragment>
+                <div className="column left">
+                  <div className="dates">
+                    {todoList ? Object.entries(todoList).map(([index, item]) => {
+                      index = Number.parseInt(index);
+                      const date = new Date(item.value.date).toLocaleString();
+                      return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
+                        <button className="date" onClick={() => this.select(index)}>{date}</button>
+                        <button className="delete" onClick={() => this.delete(item.id)}>X</button>
+                      </div>
+                    }) : null}
+                  </div>
+                </div>
+        
+                <div className="column right">
+                  <div>
+                    <h3>
+                      {new Date(todoList[selected].value.date).toLocaleString()}
+                      <span className={"saved" + (saved ? "" : " hidden")}>✓</span>
+                    </h3>
+                  </div>
+                  <textarea value={todoText} onChange={this.handleChange}/>
+                </div>
+              </Fragment>
+            )}
+  
+            <button className={"button" + (todoList.length === 0 ? " glow" : "")} onClick={this.handleSubmit}>+</button>
+          </Fragment>
+        )}
       </div>
     );
   }
