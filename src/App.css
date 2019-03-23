@@ -64,6 +64,18 @@ h3 {
   background-color: #bbb;
 }
 
+.title {
+  padding: 0.3em;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #555;
+  background-color: inherit;
+  color: white;
+  font-size: 0.85em;
+  text-align: center;
+  width: 70%;
+}
+
 .saved {
   color: lime;
   padding-left: 1em;
@@ -126,6 +138,7 @@ h3 {
   font-size: calc(0.7em + 0.35vw);
   color: white;
   border: 0;
+  user-select: none;
   transition: background-color 0.3s;
 }
 

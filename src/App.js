@@ -8,15 +8,17 @@ class App extends Component {
     super(props);
 
     this.state = {
-      todoList: {}, // Mirrors the Todo list in Firebase.
-      todoText: '', // Mirrors the new Todo Text field in the UI.
+      todoList: {},
+      todoTitle: '',
+      todoText: '',
       selected: 0,
       saved: true,
       initialLoad: true
     };
 
+    this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCreate = this.handleCreate.bind(this);
   }
   
   componentDidMount() {
@@ -36,9 +38,16 @@ class App extends Component {
       });
 
       const selected = Math.min(this.state.selected, todoList.length - 1);
+      const todoTitle = todoList[selected] ? todoList[selected].value.title : '';
       const todoText = todoList[selected] ? todoList[selected].value.text : '';
 
-      this.setState({ todoList: todoList || [], selected: selected || 0, todoText: todoText || '', initialLoad: false });
+      this.setState({
+        todoList: todoList || [],
+        selected: selected || 0,
+        todoTitle: todoTitle || '',
+        todoText: todoText || '',
+        initialLoad: false
+      });
     });
   }
   
@@ -48,25 +57,35 @@ class App extends Component {
     this.updateData.clear();
   }
 
+  handleTitleChange(e) {
+    this.setState({todoTitle: e.target.value, saved: false});
+    this.updateData();
+  }
+
   handleChange(e) {
     this.setState({todoText: e.target.value, saved: false});
     this.updateData();
   }
   
   updateData = debounce(() => {
-    const { selected, todoList, todoText } = this.state;
-    this.firebaseRef.child(todoList[selected].id).update({text: todoText}, err => {
+    const { selected, todoList, todoTitle, todoText } = this.state;
+    this.firebaseRef.child(todoList[selected].id).update({title: todoTitle, text: todoText}, err => {
       if (!err) this.setState({saved: true});
     });
   }, 2000);
   
   // This is triggered when the "Add New Todo" button is clicked.
-  handleSubmit(e) {
+  handleCreate(e) {
     if (e) e.preventDefault();
     // Add the new todo to Firebase.
     this.firebaseRef.push({
-      text: 'This is a new item',
-      date: new Date().getTime()
+      date: new Date().getTime(),
+      title: new Date().toLocaleString(),
+      text: '...',
+    }, err => {
+      if (!err) {
+        this.select(Math.max(0, this.state.selected - 1));
+      }
     });
   }
 
@@ -83,7 +102,7 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, todoList, todoText } = this.state;
+    const { initialLoad, saved, selected, todoList, todoTitle, todoText } = this.state;
 
     return (
       <div className="App">
@@ -104,9 +123,8 @@ class App extends Component {
                   <div className="dates">
                     {todoList ? Object.entries(todoList).map(([index, item]) => {
                       index = Number.parseInt(index);
-                      const date = new Date(item.value.date).toLocaleString();
                       return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                        <button className="date" onClick={() => this.select(index)}>{date}</button>
+                        <button className="date" onClick={() => this.select(index)}>{item.value.title}</button>
                         <button className="delete" onClick={() => this.delete(item.id)}>X</button>
                       </div>
                     }) : null}
@@ -116,7 +134,7 @@ class App extends Component {
                 <div className="column right">
                   <div>
                     <h3>
-                      {new Date(todoList[selected].value.date).toLocaleString()}
+                      <input className="title" type="text" value={todoTitle} onChange={this.handleTitleChange}/>
                       <span className={"saved" + (saved ? "" : " hidden")}>✓</span>
                     </h3>
                   </div>
@@ -125,7 +143,7 @@ class App extends Component {
               </Fragment>
             )}
   
-            <button className={"button" + (todoList.length === 0 ? " glow" : "")} onClick={this.handleSubmit}>+</button>
+            <button className={"button" + (todoList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>+</button>
           </Fragment>
         )}
       </div>
