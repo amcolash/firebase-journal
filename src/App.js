@@ -100,7 +100,8 @@ class App extends Component {
   }
 
   delete(key) {
-    this.firebaseRef.child(key).remove();
+    var del = window.confirm('Are you sure you want to delete this note?');
+    if (del) this.firebaseRef.child(key).remove();
   }
 
   select(index) {
