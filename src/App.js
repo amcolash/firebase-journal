@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react';
-import { debounce } from "debounce";
+import { debounce } from 'debounce';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck, faLongArrowAltDown, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import firebase from './firebase.js';
 import './App.css';
 
@@ -115,7 +117,7 @@ class App extends Component {
                   <br/>
                   Click the plus button to get started.
                 </h2>
-                <div className="icon">⬇</div>
+                <FontAwesomeIcon icon={faLongArrowAltDown} className="arrow" />
               </div>
             ) : (
               <Fragment>
@@ -125,7 +127,7 @@ class App extends Component {
                       index = Number.parseInt(index);
                       return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
                         <button className="date" onClick={() => this.select(index)}>{selected === index ? itemTitle : item.value.title}</button>
-                        <button className="delete" onClick={() => this.delete(item.id)}>X</button>
+                        <button className="delete" onClick={() => this.delete(item.id)}><FontAwesomeIcon icon={faTrash} /></button>
                       </div>
                     }) : null}
                   </div>
@@ -135,7 +137,8 @@ class App extends Component {
                   <div>
                     <h3>
                       <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
-                      <span className={"saved" + (saved ? "" : " hidden")}>✓</span>
+                      {/* <span className={"saved" + (saved ? "" : " hidden")}></span> */}
+                      <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden")} />
                     </h3>
                   </div>
                   <textarea value={itemText} onChange={this.handleTextChange}/>
@@ -143,7 +146,9 @@ class App extends Component {
               </Fragment>
             )}
   
-            <button className={"button" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>+</button>
+            <button className={"button" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
+              <FontAwesomeIcon icon={faPlus}/>
+            </button>
           </Fragment>
         )}
       </div>
