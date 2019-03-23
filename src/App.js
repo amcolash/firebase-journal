@@ -8,76 +8,76 @@ class App extends Component {
     super(props);
 
     this.state = {
-      todoList: {},
-      todoTitle: '',
-      todoText: '',
+      itemList: {},
+      itemTitle: '',
+      itemText: '',
       selected: 0,
       saved: true,
       initialLoad: true
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
     this.handleCreate = this.handleCreate.bind(this);
   }
   
   componentDidMount() {
-    // Updating the `todoList` local state attribute when the Firebase Realtime Database data
-    // under the '/todoList' path changes.
-    this.firebaseRef = firebase.database().ref('/todoList');
+    // Updating the `itemList` local state attribute when the Firebase Realtime Database data
+    // under the '/itemList' path changes.
+    this.firebaseRef = firebase.database().ref('/itemList');
     this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
       const values = snap.val();
 
       if (!values) {
-        this.setState({todoList: [], initialLoad: false});
+        this.setState({itemList: [], initialLoad: false});
         return;
       }
 
-      const todoList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
+      const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
         return b.value.date - a.value.date;
       });
 
-      const selected = Math.min(this.state.selected, todoList.length - 1);
-      const todoTitle = todoList[selected] ? todoList[selected].value.title : '';
-      const todoText = todoList[selected] ? todoList[selected].value.text : '';
+      const selected = Math.min(this.state.selected, itemList.length - 1);
+      const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
+      const itemText = itemList[selected] ? itemList[selected].value.text : '';
 
       this.setState({
-        todoList: todoList || [],
+        itemList: itemList || [],
         selected: selected || 0,
-        todoTitle: todoTitle || '',
-        todoText: todoText || '',
+        itemTitle: itemTitle || '',
+        itemText: itemText || '',
         initialLoad: false
       });
     });
   }
   
   componentWillUnmount() {
-    // Un-register the listener on '/todoList'.
+    // Un-register the listener on '/itemList'.
     this.firebaseRef.off('value', this.firebaseCallback);
     this.updateData.clear();
   }
 
   handleTitleChange(e) {
-    this.setState({todoTitle: e.target.value, saved: false});
+    this.setState({itemTitle: e.target.value, saved: false});
     this.updateData();
   }
 
-  handleChange(e) {
-    this.setState({todoText: e.target.value, saved: false});
+  handleTextChange(e) {
+    this.setState({itemText: e.target.value, saved: false});
     this.updateData();
   }
   
   updateData = debounce(() => {
-    const { selected, todoList, todoTitle, todoText } = this.state;
-    this.firebaseRef.child(todoList[selected].id).update({title: todoTitle, text: todoText}, err => {
+    const { selected, itemList, itemTitle, itemText } = this.state;
+    this.firebaseRef.child(itemList[selected].id).update({title: itemTitle, text: itemText}, err => {
       if (!err) this.setState({saved: true});
     });
   }, 1500);
   
-  // This is triggered when the "Add New Todo" button is clicked.
+  // This is triggered when the "Add New item" button is clicked.
   handleCreate(e) {
     if (e) e.preventDefault();
-    // Add the new todo to Firebase.
+    // Add the new item to Firebase.
     this.firebaseRef.push({
       date: new Date().getTime(),
       title: new Date().toLocaleString(),
@@ -94,21 +94,21 @@ class App extends Component {
   }
 
   select(index) {
-    const { selected, todoList, todoText } = this.state;
+    const { selected, itemList, itemText } = this.state;
 
     this.updateData.clear();
-    this.firebaseRef.child(todoList[selected].id).update({text: todoText});
-    this.setState({selected: index, todoText: todoList[index].value.text});
+    this.firebaseRef.child(itemList[selected].id).update({text: itemText});
+    this.setState({selected: index, itemText: itemList[index].value.text});
   }
 
   render() {
-    const { initialLoad, saved, selected, todoList, todoTitle, todoText } = this.state;
+    const { initialLoad, saved, selected, itemList, itemTitle, itemText } = this.state;
 
     return (
       <div className="App">
         {initialLoad ? null : (
           <Fragment>
-            {todoList.length === 0 ? (
+            {itemList.length === 0 ? (
               <div className="noNotes">
                 <h2>
                   You don't have any notes yet.
@@ -121,10 +121,10 @@ class App extends Component {
               <Fragment>
                 <div className="column left">
                   <div className="dates">
-                    {todoList ? Object.entries(todoList).map(([index, item]) => {
+                    {itemList ? Object.entries(itemList).map(([index, item]) => {
                       index = Number.parseInt(index);
                       return <div className={"item" + (selected === index ? " selected" : "")} key={index}>
-                        <button className="date" onClick={() => this.select(index)}>{selected === index ? todoTitle : item.value.title}</button>
+                        <button className="date" onClick={() => this.select(index)}>{selected === index ? itemTitle : item.value.title}</button>
                         <button className="delete" onClick={() => this.delete(item.id)}>X</button>
                       </div>
                     }) : null}
@@ -134,16 +134,16 @@ class App extends Component {
                 <div className="column right">
                   <div>
                     <h3>
-                      <input className="title" type="text" value={todoTitle} onChange={this.handleTitleChange}/>
+                      <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
                       <span className={"saved" + (saved ? "" : " hidden")}>✓</span>
                     </h3>
                   </div>
-                  <textarea value={todoText} onChange={this.handleChange}/>
+                  <textarea value={itemText} onChange={this.handleTextChange}/>
                 </div>
               </Fragment>
             )}
   
-            <button className={"button" + (todoList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>+</button>
+            <button className={"button" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>+</button>
           </Fragment>
         )}
       </div>
