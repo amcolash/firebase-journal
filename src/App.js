@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import moment from 'moment';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown, faMoon, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDoubleLeft, faAngleDoubleRight, faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown, faMoon, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import firebase from './firebase.js';
 import './App.css';
 
@@ -18,7 +18,8 @@ class App extends Component {
       saved: true,
       initialLoad: true,
       darkMode: true,
-      fullscreen: false
+      fullscreen: false,
+      sidebar: true
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -91,7 +92,7 @@ class App extends Component {
     this.firebaseRef.push({
       created: now.getTime(),
       updated: now.getTime(),
-      title: now.toLocaleString(),
+      title: moment(now).format('M/D/YYYY, h:mm A'),
       text: '...',
     }, err => {
       if (!err) {
@@ -122,7 +123,7 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode, fullscreen } = this.state;
+    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode, fullscreen, sidebar } = this.state;
 
     return (
       <div className={"App" + (darkMode ? "" : " inverted")}>
@@ -139,7 +140,7 @@ class App extends Component {
               </div>
             ) : (
               <Fragment>
-                <div className="column left">
+                <div className={"column left" + (sidebar ? "" : " collapsed")}>
                   <div className="dates">
                     {itemList ? Object.entries(itemList).map(([index, item]) => {
                       index = Number.parseInt(index);
@@ -157,10 +158,12 @@ class App extends Component {
                       )
                     }) : null}
                   </div>
-                  <div className="footer">
+                  <div className={"footer" + (!sidebar ? " floating" : "")}>
+                    <div className="spacer"></div>
                     <button className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !darkMode})}>
                       <FontAwesomeIcon icon={faMoon}/>
                     </button>
+
                     <button className={"button" + (fullscreen ? " selected" : "")} onClick={() => {
                       if (fullscreen) {
                         document.exitFullscreen();
@@ -171,6 +174,11 @@ class App extends Component {
                       this.setState({fullscreen: !fullscreen});
                     }}>
                       <FontAwesomeIcon icon={fullscreen ? faCompressArrowsAlt : faExpandArrowsAlt}/>
+                    </button>
+
+                    <div className="spacer"></div>
+                    <button className={"button"} onClick={() => this.setState({sidebar: !sidebar})}>
+                      <FontAwesomeIcon icon={sidebar ? faAngleDoubleLeft : faAngleDoubleRight}/>
                     </button>
                   </div>
                 </div>

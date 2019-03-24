@@ -45,7 +45,8 @@ h3 {
   to { box-shadow: orange 0 0 2.5em, orange 0 0 2.5em; }
 }
 
-.button.glow {
+.circle.glow {
+  background-color: #ddd;
   animation: glow 2s alternate infinite ease-in-out;
 }
 
@@ -100,6 +101,11 @@ h3 {
 .left {
   overflow: hidden;
   flex: 0 0 14em;
+  transition: flex 0.5s;
+}
+
+.collapsed {
+  flex: 0;
 }
 
 .right {
@@ -123,12 +129,24 @@ h3 {
 }
 
 .dates {
+  overflow-x: hidden;
   overflow-y: auto;
-  height: calc(100vh - 2.5em);
+  height: calc(100vh - 3em);
 }
 
 .footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 14.25em;
+  display: flex;
   border-top: 1px solid #555;
+  padding: 0.25em 0;
+  transition: all 0.5s;
+}
+
+.floating {
+  width: 0;
 }
 
 .item {
@@ -155,6 +173,11 @@ h3 {
   border: 0;
   user-select: none;
   transition: background-color 0.3s;
+}
+
+.spacer {
+  flex-grow: 1;
+  padding-left: 0.5em;
 }
 
 .date {
