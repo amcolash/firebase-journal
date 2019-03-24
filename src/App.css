@@ -13,6 +13,14 @@ h3 {
   overflow: hidden;
 }
 
+.padRight {
+  padding-right: 0.35em;
+}
+
+.center {
+  align-items: center;
+}
+
 .inverted {
   filter: invert(100%);
 }
@@ -226,6 +234,10 @@ h3 {
 
   .footer:not(.collapsed) {
     width: 100%;
+  }
+
+  .right:not(.expanded) textarea {
+    overflow: hidden;
   }
 
   .spacer {
