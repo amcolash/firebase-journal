@@ -122,7 +122,7 @@ h3 {
   background-color: #333;
   color: white;
   box-sizing: border-box;
-  height: calc(100vh);
+  height: calc(100vh - 4em);
   width: 100%;
   border: 0;
   resize: none;
@@ -145,8 +145,16 @@ h3 {
   transition: all 0.5s;
 }
 
-.floating {
+.footer.collapsed {
   width: 0;
+}
+
+.footer.collapsed .button {
+  opacity: 0.25;
+}
+
+.footer.collapsed .button:hover {
+  opacity: 0.6;
 }
 
 .item {

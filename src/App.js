@@ -158,7 +158,7 @@ class App extends Component {
                       )
                     }) : null}
                   </div>
-                  <div className={"footer" + (!sidebar ? " floating" : "")}>
+                  <div className={"footer" + (!sidebar ? " collapsed" : "")}>
                     <div className="spacer"></div>
                     <button className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !darkMode})}>
                       <FontAwesomeIcon icon={faMoon}/>
