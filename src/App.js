@@ -183,7 +183,7 @@ class App extends Component {
                   </div>
                 </div>
         
-                <div className="column right">
+                <div className={"column right" + (sidebar ? "" : " expanded")}>
                   <div>
                     <h3>
                       <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>

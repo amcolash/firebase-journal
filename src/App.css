@@ -10,6 +10,7 @@ h3 {
   font-size: calc(1em + 0.5vw);
   color: white;
   height: calc(100vh);
+  overflow: hidden;
 }
 
 .inverted {
@@ -115,6 +116,12 @@ h3 {
   width: 100%;
   border-left: 1px solid #999;
   margin-left: 0.25em;
+  transition: all 0.5s;
+}
+
+.right.expanded {
+  margin-left: 0;
+  border-left-color: rgba(0,0,0,0);
 }
 
 .right textarea {
@@ -188,6 +195,7 @@ h3 {
 .spacer {
   flex-grow: 1;
   padding-left: 0.5em;
+  transition: all 0.5s;
 }
 
 .date {
@@ -204,4 +212,23 @@ h3 {
 
 .delete:hover {
   background-color: #d33;
+}
+
+/* At the bottom so things cascade properly */
+@media only screen and (max-width: 600px) {
+  .footer {
+    border-top-color: rgba(0,0,0,0);
+  }
+
+  .left:not(.collapsed) {
+    flex: 1 0 100%;
+  }
+
+  .footer:not(.collapsed) {
+    width: 100%;
+  }
+
+  .spacer {
+    flex-grow: 0;
+  }
 }
