@@ -39,44 +39,44 @@ class App extends Component {
     firebase.app.auth().onAuthStateChanged(u => {
       if (u) {
         this.setState({user: u, initialAuth: false});
+
+        // Updating the `itemList` local state attribute when the Firebase Realtime Database data
+        // under the '/itemList' path changes.
+        this.firebaseRef = firebase.app.database().ref('/itemList');
+        this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
+          const values = snap.val();
+
+          if (!values) {
+            this.setState({itemList: [], initialLoad: false});
+            return;
+          }
+
+          const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
+            return b.value.created - a.value.created;
+          });
+
+          const selected = Math.min(this.state.selected, itemList.length - 1);
+          const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
+          const itemText = itemList[selected] ? itemList[selected].value.text : '';
+
+          this.setState({
+            itemList: itemList || [],
+            selected: selected || 0,
+            itemTitle: itemTitle || '',
+            itemText: itemText || '',
+            initialLoad: false
+          });
+        });
+
+        var key = firebase.app.database().ref('/key');
+        key.on('value', (snap) => {
+          this.setState({
+            key: snap.val()
+          });
+        });
       } else {
         this.setState({user: undefined, initialAuth: false});
       }
-    });
-
-    // Updating the `itemList` local state attribute when the Firebase Realtime Database data
-    // under the '/itemList' path changes.
-    this.firebaseRef = firebase.app.database().ref('/itemList');
-    this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
-      const values = snap.val();
-
-      if (!values) {
-        this.setState({itemList: [], initialLoad: false});
-        return;
-      }
-
-      const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
-        return b.value.created - a.value.created;
-      });
-
-      const selected = Math.min(this.state.selected, itemList.length - 1);
-      const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
-      const itemText = itemList[selected] ? itemList[selected].value.text : '';
-
-      this.setState({
-        itemList: itemList || [],
-        selected: selected || 0,
-        itemTitle: itemTitle || '',
-        itemText: itemText || '',
-        initialLoad: false
-      });
-    });
-
-    var key = firebase.app.database().ref('/key');
-    key.on('value', (snap) => {
-      this.setState({
-        key: snap.val()
-      });
     });
   }
   

@@ -22,8 +22,6 @@ function signIn() {
       var token = result.credential.accessToken;
       // The signed-in user info.
       var user = result.user;
-      console.log(token, user);
-      // ...
     }).catch(error => {
       // Handle Errors here.
       var errorCode = error.code;
@@ -32,8 +30,7 @@ function signIn() {
       var email = error.email;
       // The firebase.auth.AuthCredential type that was used.
       var credential = error.credential;
-      console.log(errorCode, errorMessage, email, credential);
-      // ...
+      console.error(errorCode, errorMessage, email, credential);
     });
   });
 }
