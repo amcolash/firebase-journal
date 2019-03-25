@@ -132,6 +132,10 @@ h3 {
   border-left-color: rgba(0,0,0,0);
 }
 
+.right.simple {
+  width: 65%;
+}
+
 .right textarea {
   padding: 0.5em 0.75em 3em;
   font-size: 0.75em;

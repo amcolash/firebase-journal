@@ -4,7 +4,7 @@ import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleLeft, faAngleDoubleRight, faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown,
-  faMoon, faPlus, faTrash, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+  faMoon, faPlus, faTrash, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import firebase from './firebase.js';
 import crypt from './crypt';
@@ -22,6 +22,7 @@ class App extends Component {
       saved: true,
       initialLoad: true,
       darkMode: true,
+      simple: false,
       fullscreen: false,
       sidebar: true,
       initialAuth: true,
@@ -153,7 +154,7 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, key } = this.state;
+    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, key, simple } = this.state;
     const itemTitle = user ? crypt.decrypt(this.state.itemTitle, crypt.decrypt(key, user.uid)) : '';
     const itemText = user ? crypt.decrypt(this.state.itemText, crypt.decrypt(key, user.uid)) : '';
 
@@ -214,6 +215,13 @@ class App extends Component {
                         <FontAwesomeIcon icon={faMoon}/>
                       </button>
 
+                      <button title="Toggle Simple Mode" className={"button" + (simple ? " selected" : "")} onClick={() => {
+                        var newSidebar = !simple ? false : sidebar;
+                        this.setState({simple: !simple, sidebar: newSidebar})}
+                      }>
+                        <FontAwesomeIcon icon={faEye}/>
+                      </button>
+
                       <button title="Toggle Full Screen" className={"button" + (fullscreen ? " selected" : "")} onClick={() => {
                         if (fullscreen) {
                           document.exitFullscreen();
@@ -227,13 +235,13 @@ class App extends Component {
                       </button>
 
                       <div className="spacer"></div>
-                      <button title="Toggle Sidebar" className={"button"} onClick={() => this.setState({sidebar: !sidebar})}>
+                      <button title="Toggle Sidebar" className={"button"} onClick={() => this.setState({sidebar: !sidebar, simple: false})}>
                         <FontAwesomeIcon icon={sidebar ? faAngleDoubleLeft : faAngleDoubleRight}/>
                       </button>
                     </div>
                   </div>
           
-                  <div className={"column right" + (sidebar ? "" : " expanded")}>
+                  <div className={"column right" + (sidebar ? "" : " expanded") + (simple ? " simple" : "")}>
                     <div>
                       <h3>
                         <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
