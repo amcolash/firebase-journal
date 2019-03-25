@@ -193,7 +193,7 @@ class App extends Component {
                         return (
                           <div className="item" key={index}>
                             <button className={"button date" + (selected === index ? " selected" : "")} onClick={() => this.select(index)}>
-                              {selected === index ? itemTitle : item.value.title}
+                              {selected === index ? itemTitle : crypt.decrypt(item.value.title, crypt.decrypt(key, user.uid))}
                               <br/>
                               <span className="updated">{moment(item.value.updated).fromNow()}</span>
                             </button>
