@@ -1,3 +1,8 @@
+# firebase-journal
+A pretty basic react app that can be used as a journal or todo list with at rest db encryption.
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
