@@ -1,0 +1,8 @@
+// These rules only let me access db when authed
+
+{
+  "rules": {
+    ".read": "auth != null && auth.uid == 'ARGJcuPJCzTFk9XSyYKP9z7ui6z1'",
+    ".write": "auth != null && auth.uid == 'ARGJcuPJCzTFk9XSyYKP9z7ui6z1'"
+  }
+}
