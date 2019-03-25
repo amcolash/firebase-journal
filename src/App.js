@@ -1,11 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import moment from 'moment';
+import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleLeft, faAngleDoubleRight, faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown,
   faMoon, faPlus, faTrash, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import firebase from './firebase.js';
+import crypt from './crypt';
 import './App.css';
 
 class App extends Component {
@@ -23,7 +25,8 @@ class App extends Component {
       fullscreen: false,
       sidebar: true,
       initialAuth: true,
-      user: undefined
+      user: undefined,
+      key: ''
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -67,6 +70,13 @@ class App extends Component {
         initialLoad: false
       });
     });
+
+    var key = firebase.app.database().ref('/key');
+    key.on('value', (snap) => {
+      this.setState({
+        key: snap.val()
+      });
+    });
   }
   
   componentWillUnmount() {
@@ -76,12 +86,16 @@ class App extends Component {
   }
 
   handleTitleChange(e) {
-    this.setState({itemTitle: e.target.value, saved: false});
+    const { user, key } = this.state;
+    const title = crypt.encrypt(e.target.value, crypt.decrypt(key, user.uid));
+    this.setState({itemTitle: title, saved: false});
     this.updateData();
   }
 
   handleTextChange(e) {
-    this.setState({itemText: e.target.value, saved: false});
+    const { user, key } = this.state;
+    const text = crypt.encrypt(e.target.value, crypt.decrypt(key, user.uid));
+    this.setState({itemText: text, saved: false});
     this.updateData();
   }
   
@@ -99,13 +113,17 @@ class App extends Component {
   // This is triggered when the "Add New item" button is clicked.
   handleCreate(e) {
     if (e) e.preventDefault();
+    const { user, key } = this.state;
+
     // Add the new item to Firebase.
     const now = new Date();
+    const title = moment(now).format('M/D/YYYY, h:mm A');
+    const text = '...';
     this.firebaseRef.push({
       created: now.getTime(),
       updated: now.getTime(),
-      title: moment(now).format('M/D/YYYY, h:mm A'),
-      text: '...',
+      title: crypt.encrypt(title, crypt.decrypt(key, user.uid)),
+      text: crypt.encrypt(text, crypt.decrypt(key, user.uid)),
     }, err => {
       if (!err) {
         this.select(Math.max(0, this.state.selected - 1));
@@ -135,10 +153,12 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, itemTitle, itemText, darkMode, fullscreen, sidebar, user, initialAuth } = this.state;
+    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, key } = this.state;
+    const itemTitle = user ? crypt.decrypt(this.state.itemTitle, crypt.decrypt(key, user.uid)) : '';
+    const itemText = user ? crypt.decrypt(this.state.itemText, crypt.decrypt(key, user.uid)) : '';
 
     return (
-      <div className={"App" + (darkMode ? "" : " inverted") + (!user && !initialAuth ? " center" : "")}>
+      <div className={"App" + (darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
         {!user && !initialAuth ? (
           <div className="signin">
             <span>You are not authenticated.</span><br/>
@@ -150,7 +170,9 @@ class App extends Component {
             </button>
           </div>
         ) : (
-          initialLoad ? null : (
+          initialAuth || initialLoad ? (
+            <Loader type="Triangle" color="#ccc" height="80" width="80" />
+          ) : (
             <Fragment>
               {itemList.length === 0 ? (
                 <div className="noNotes">
