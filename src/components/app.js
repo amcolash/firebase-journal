@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 
-import crypt from './crypt';
-import firebase from './firebase.js';
+import crypt from '../crypt';
+import firebase from '../firebase';
 import Button from './button';
 import Footer from './footer';
 import Item from './item';

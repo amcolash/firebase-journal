@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleLeft, faAngleDoubleRight, faExpandArrowsAlt, faCompressArrowsAlt,
 faMoon, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 
-import firebase from './firebase';
+import firebase from '../firebase';
 import Button from './button';
 
 import './footer.css';
