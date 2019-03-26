@@ -39,4 +39,8 @@
   .spacer {
     flex-grow: 0;
   }
+
+  .simpleMode {
+    display: none;
+  }
 }

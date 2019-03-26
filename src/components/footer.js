@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleLeft, faAngleDoubleRight, faExpandArrowsAlt, faCompressArrowsAlt,
 faMoon, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 
@@ -24,7 +24,7 @@ class Footer extends Component {
           <FontAwesomeIcon icon={faMoon}/>
         </Button>
 
-        <Button title="Toggle Simple Mode" selected={footer.simple} onClick={toggleSimpleMode}>
+        <Button title="Toggle Simple Mode" className="simpleMode" selected={footer.simple} onClick={toggleSimpleMode}>
           <FontAwesomeIcon icon={faEye}/>
         </Button>
 

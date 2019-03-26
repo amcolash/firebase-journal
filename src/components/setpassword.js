@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 import crypt from '../crypt';
 import firebase from '../firebase';
@@ -40,6 +42,7 @@ class SetPassword extends Component {
         />
 
         <Button onClick={this.savePassword}>
+          <FontAwesomeIcon icon={faLock} className="padRight"/>
           Save
         </Button>
       </div>
