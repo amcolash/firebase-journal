@@ -3,7 +3,7 @@ import moment from 'moment';
 import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import crypt from '../crypt';
 import firebase from '../firebase';
@@ -13,6 +13,7 @@ import Editor from './editor';
 import Footer from './footer';
 import ItemList from './itemlist';
 import Login from './login';
+import NoItems from './noitems';
 
 import './app.css';
 
@@ -21,11 +22,11 @@ class App extends Component {
     super(props);
 
     this.state = {
-      itemList: {},
       initialLoad: true,
       initialAuth: true,
       user: undefined,
       decryptKey: '',
+      itemList: [],
       item: {
         selected: 0,
         itemTitle: '',
@@ -190,14 +191,7 @@ class App extends Component {
           ) : (
             <Fragment>
               {itemList.length === 0 ? (
-                <div className="noNotes">
-                  <h2>
-                    You don't have any notes yet.
-                    <br/>
-                    Click the plus button to get started.
-                  </h2>
-                  <FontAwesomeIcon icon={faLongArrowAltDown} className="arrow" />
-                </div>
+                <NoItems />
               ) : (
                 <Fragment>
                   <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>

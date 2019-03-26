@@ -1,0 +1,20 @@
+
+.noItems {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes hover {
+  from { bottom: 1.75em; }
+  to { bottom: 2em; }
+}
+
+.noItems .arrow {
+  position: absolute;
+  bottom: 1.75em;
+  font-size: 2em;
+  right: 0em;
+  width: 2em;
+  color: orange;
+  animation: hover 2s alternate infinite ease-in-out;
+}
