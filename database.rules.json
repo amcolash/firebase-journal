@@ -1,10 +1,12 @@
 // Only allow authed users to see their own data
 
 {
-  "users": {
-    "$uid": {
-      ".read": "auth != null && auth.uid == $uid",
-      ".write": "auth != null && auth.uid == $uid"
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
     }
-  }
+	}
 }
