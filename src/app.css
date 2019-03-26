@@ -178,20 +178,6 @@ h3 {
   opacity: 0.6;
 }
 
-.item {
-  display: flex;
-}
-
-.date {
-  width: calc(100% - 2.5em);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.updated {
-  font-size: 0.5em;
-}
-
 .button {
   padding: 0.5em;
   margin: 0.3em;
@@ -220,10 +206,6 @@ h3 {
 
 .button:hover {
   background-color: #777;
-}
-
-.delete:hover {
-  background-color: #d33;
 }
 
 /* At the bottom so things cascade properly */

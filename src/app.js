@@ -4,11 +4,14 @@ import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDoubleLeft, faAngleDoubleRight, faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown,
-  faMoon, faPlus, faTrash, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons'
+  faMoon, faPlus, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
-import firebase from './firebase.js';
+
 import crypt from './crypt';
-import './App.css';
+import firebase from './firebase.js';
+
+import './app.css';
+import Item from './item';
 
 class App extends Component {
   constructor(props) {
@@ -27,12 +30,14 @@ class App extends Component {
       sidebar: true,
       initialAuth: true,
       user: undefined,
-      key: ''
+      decryptKey: ''
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleCreate = this.handleCreate.bind(this);
+    this.selectItem = this.selectItem.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
   }
   
   componentDidMount() {
@@ -70,9 +75,8 @@ class App extends Component {
 
         var key = firebase.app.database().ref('/key');
         key.on('value', (snap) => {
-          this.setState({
-            key: snap.val()
-          });
+          const val = snap.val();
+          if (val) this.setState({ decryptKey: crypt.decrypt(val, u.uid) });
         });
       } else {
         this.setState({user: undefined, initialAuth: false});
@@ -87,15 +91,13 @@ class App extends Component {
   }
 
   handleTitleChange(e) {
-    const { user, key } = this.state;
-    const title = crypt.encrypt(e.target.value, crypt.decrypt(key, user.uid));
+    const title = crypt.encrypt(e.target.value, this.state.decryptKey);
     this.setState({itemTitle: title, saved: false});
     this.updateData();
   }
 
   handleTextChange(e) {
-    const { user, key } = this.state;
-    const text = crypt.encrypt(e.target.value, crypt.decrypt(key, user.uid));
+    const text = crypt.encrypt(e.target.value, this.state.decryptKey);
     this.setState({itemText: text, saved: false});
     this.updateData();
   }
@@ -114,7 +116,7 @@ class App extends Component {
   // This is triggered when the "Add New item" button is clicked.
   handleCreate(e) {
     if (e) e.preventDefault();
-    const { user, key } = this.state;
+    const decryptKey = this.state.decryptKey;
 
     // Add the new item to Firebase.
     const now = new Date();
@@ -123,21 +125,21 @@ class App extends Component {
     this.firebaseRef.push({
       created: now.getTime(),
       updated: now.getTime(),
-      title: crypt.encrypt(title, crypt.decrypt(key, user.uid)),
-      text: crypt.encrypt(text, crypt.decrypt(key, user.uid)),
+      title: crypt.encrypt(title, decryptKey),
+      text: crypt.encrypt(text, decryptKey),
     }, err => {
       if (!err) {
-        this.select(Math.max(0, this.state.selected - 1));
+        this.selectItem(Math.max(0, this.state.selected - 1));
       }
     });
   }
 
-  delete(key) {
+  deleteItem(id) {
     var del = window.confirm('Are you sure you want to delete this note?');
-    if (del) this.firebaseRef.child(key).remove();
+    if (del) this.firebaseRef.child(id).remove();
   }
 
-  select(index) {
+  selectItem(index) {
     const { selected, itemList, itemText, itemTitle, saved } = this.state;
 
     // Save unsaved changes on select of new item
@@ -154,9 +156,9 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, key, simple } = this.state;
-    const itemTitle = user ? crypt.decrypt(this.state.itemTitle, crypt.decrypt(key, user.uid)) : '';
-    const itemText = user ? crypt.decrypt(this.state.itemText, crypt.decrypt(key, user.uid)) : '';
+    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, decryptKey, simple } = this.state;
+    const itemTitle = user ? crypt.decrypt(this.state.itemTitle, decryptKey) : '';
+    const itemText = user ? crypt.decrypt(this.state.itemText, decryptKey) : '';
 
     return (
       <div className={"App" + (darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
@@ -191,16 +193,17 @@ class App extends Component {
                       {itemList ? Object.entries(itemList).map(([index, item]) => {
                         index = Number.parseInt(index);
                         return (
-                          <div className="item" key={index}>
-                            <button className={"button date" + (selected === index ? " selected" : "")} onClick={() => this.select(index)}>
-                              {selected === index ? itemTitle : crypt.decrypt(item.value.title, crypt.decrypt(key, user.uid))}
-                              <br/>
-                              <span className="updated">{moment(item.value.updated).fromNow()}</span>
-                            </button>
-                            <button title="Delete" className={"button delete" + (darkMode ? "" : " inverted")} onClick={() => this.delete(item.id)}>
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                          </div>
+                          <Item
+                            index={index}
+                            key={index}
+                            selected={selected}
+                            item={item}
+                            itemTitle={itemTitle}
+                            decryptKey={decryptKey}
+                            darkMode={darkMode}
+                            selectItem={this.selectItem}
+                            deleteItem={this.deleteItem}
+                          />
                         )
                       }) : null}
                     </div>

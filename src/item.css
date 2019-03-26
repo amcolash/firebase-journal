@@ -1,0 +1,17 @@
+.item {
+  display: flex;
+}
+
+.date {
+  width: calc(100% - 2.5em);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.updated {
+  font-size: 0.5em;
+}
+
+.delete:hover {
+  background-color: #d33;
+}
