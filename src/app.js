@@ -11,6 +11,7 @@ import crypt from './crypt';
 import firebase from './firebase.js';
 
 import './app.css';
+import Button from './button';
 import Item from './item';
 
 class App extends Component {
@@ -167,10 +168,10 @@ class App extends Component {
             <span>You are not authenticated.</span><br/>
             <span>You need to sign in to use this app.</span><br/>
             <br/>
-            <button title="Sign In" className="button" onClick={() => firebase.signIn()}>
+            <Button title="Sign In" onClick={() => firebase.signIn()}>
               <FontAwesomeIcon icon={faGoogle} className="padRight" />
               Sign In
-            </button>
+            </Button>
           </div>
         ) : (
           initialAuth || initialLoad ? (
@@ -208,24 +209,24 @@ class App extends Component {
                       }) : null}
                     </div>
                     <div className={"footer" + (!sidebar ? " collapsed" : "")}>
-                      <button title="Sign Out" className="button" onClick={() => firebase.app.auth().signOut()}>
+                      <Button title="Sign Out" onClick={() => firebase.app.auth().signOut()}>
                         <FontAwesomeIcon icon={faSignOutAlt}/>
-                      </button>
+                      </Button>
 
                       <div className="spacer"></div>
 
-                      <button title="Toggle Dark Mode" className={"button" + (darkMode ? " selected" : "")} onClick={() => this.setState({darkMode: !darkMode})}>
+                      <Button title="Toggle Dark Mode" selected={darkMode} onClick={() => this.setState({darkMode: !darkMode})}>
                         <FontAwesomeIcon icon={faMoon}/>
-                      </button>
+                      </Button>
 
-                      <button title="Toggle Simple Mode" className={"button" + (simple ? " selected" : "")} onClick={() => {
+                      <Button title="Toggle Simple Mode" selected={simple} onClick={() => {
                         var newSidebar = !simple ? false : sidebar;
                         this.setState({simple: !simple, sidebar: newSidebar})}
                       }>
                         <FontAwesomeIcon icon={faEye}/>
-                      </button>
+                      </Button>
 
-                      <button title="Toggle Full Screen" className={"button" + (fullscreen ? " selected" : "")} onClick={() => {
+                      <Button title="Toggle Full Screen" selected={fullscreen} onClick={() => {
                         if (fullscreen) {
                           document.exitFullscreen();
                         } else {
@@ -235,12 +236,12 @@ class App extends Component {
                         this.setState({fullscreen: !fullscreen});
                       }}>
                         <FontAwesomeIcon icon={fullscreen ? faCompressArrowsAlt : faExpandArrowsAlt}/>
-                      </button>
+                      </Button>
 
                       <div className="spacer"></div>
-                      <button title="Toggle Sidebar" className={"button"} onClick={() => this.setState({sidebar: !sidebar, simple: false})}>
+                      <Button title="Toggle Sidebar" onClick={() => this.setState({sidebar: !sidebar, simple: false})}>
                         <FontAwesomeIcon icon={sidebar ? faAngleDoubleLeft : faAngleDoubleRight}/>
-                      </button>
+                      </Button>
                     </div>
                   </div>
           
@@ -256,9 +257,9 @@ class App extends Component {
                 </Fragment>
               )}
     
-              <button title="New Item" className={"circle" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
+              <Button title="New Item" className={"circle" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
                 <FontAwesomeIcon icon={faPlus}/>
-              </button>
+              </Button>
             </Fragment>
           )
         )}

@@ -1,0 +1,54 @@
+.button {
+  padding: 0.5em;
+  margin: 0.3em;
+  background-color: #444;
+  cursor: pointer;
+  font-size: calc(0.7em + 0.35vw);
+  color: white;
+  border: 0;
+  user-select: none;
+  transition: background-color 0.3s;
+}
+
+.button.selected {
+  background-color: #5a5a5a;
+}
+
+.button:hover {
+  background-color: #777;
+}
+
+.delete:hover {
+  background-color: #d33;
+}
+
+@keyframes glow {
+  from { box-shadow: orange 0 0 1.5em, orange 0 0 1.5em; }
+  to { box-shadow: orange 0 0 2.5em, orange 0 0 2.5em; }
+}
+
+.circle.glow {
+  background-color: #ddd;
+  animation: glow 2s alternate infinite ease-in-out;
+}
+
+.circle {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+  width: 2em;
+  height: 2em;
+  color: #555;
+  background-color: #aaa;
+  font-size: 1em;
+  line-height: 0;
+  border: 0;
+  border-radius: 100%;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.circle:hover {
+  background-color: white;
+  color: #222;
+}

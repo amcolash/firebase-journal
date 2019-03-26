@@ -5,6 +5,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import crypt from './crypt';
 
+import Button from './button';
 import './item.css';
 
 class Item extends Component {
@@ -13,14 +14,15 @@ class Item extends Component {
 
     return (
       <div className="item">
-        <button className={"button date" + (selected === index ? " selected" : "")} onClick={() => selectItem(index)}>
+        <Button className={"date"} selected={(selected === index ? " selected" : "")} onClick={() => selectItem(index)}>
           {selected === index ? itemTitle : crypt.decrypt(item.value.title, decryptKey)}
           <br/>
           <span className="updated">{moment(item.value.updated).fromNow()}</span>
-        </button>
-        <button title="Delete" className={"button delete" + (darkMode ? "" : " inverted")} onClick={() => deleteItem(item.id)}>
+        </Button>
+
+        <Button title="Delete" className={"delete" + (darkMode ? "" : " inverted")} onClick={() => deleteItem(item.id)}>
           <FontAwesomeIcon icon={faTrash} />
-        </button>
+        </Button>
       </div>
     );
   }

@@ -49,37 +49,6 @@ h3 {
   animation: hover 2s alternate infinite ease-in-out;
 }
 
-@keyframes glow {
-  from { box-shadow: orange 0 0 1.5em, orange 0 0 1.5em; }
-  to { box-shadow: orange 0 0 2.5em, orange 0 0 2.5em; }
-}
-
-.circle.glow {
-  background-color: #ddd;
-  animation: glow 2s alternate infinite ease-in-out;
-}
-
-.circle {
-  position: absolute;
-  bottom: 1em;
-  right: 1em;
-  width: 2em;
-  height: 2em;
-  color: #555;
-  background-color: #aaa;
-  font-size: 1em;
-  line-height: 0;
-  border: 0;
-  border-radius: 100%;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.circle:hover {
-  background-color: white;
-  color: #222;
-}
-
 .title {
   padding: 0.3em;
   margin: 0;
@@ -178,34 +147,10 @@ h3 {
   opacity: 0.6;
 }
 
-.button {
-  padding: 0.5em;
-  margin: 0.3em;
-  background-color: #444;
-  cursor: pointer;
-  font-size: calc(0.7em + 0.35vw);
-  color: white;
-  border: 0;
-  user-select: none;
-  transition: background-color 0.3s;
-}
-
 .spacer {
   flex-grow: 1;
   padding-left: 0.5em;
   transition: all 0.5s;
-}
-
-.date {
-  line-height: 0.8;
-}
-
-.selected {
-  background-color: #666;
-}
-
-.button:hover {
-  background-color: #777;
 }
 
 /* At the bottom so things cascade properly */
