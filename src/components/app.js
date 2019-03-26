@@ -2,15 +2,16 @@ import React, { Component, Fragment } from 'react';
 import moment from 'moment';
 import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons'
-import { faGoogle } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons';
 
 import crypt from '../crypt';
 import firebase from '../firebase';
+
 import Button from './button';
 import Footer from './footer';
 import Item from './item';
+import Login from './login';
 
 import './app.css';
 
@@ -76,8 +77,8 @@ class App extends Component {
             });
           });
 
-          var key = firebase.app.database().ref('/key');
-          key.on('value', (snap) => {
+          this.keyRef = firebase.app.database().ref('/key');
+          this.keyCallback = this.keyRef.on('value', (snap) => {
             const val = snap.val();
             if (val) this.setState({ decryptKey: crypt.decrypt(val, u.uid) });
           });
@@ -91,6 +92,7 @@ class App extends Component {
   componentWillUnmount() {
     // Un-register the listener on '/itemList'.
     this.firebaseRef.off('value', this.firebaseCallback);
+    this.keyRef.off('value', this.keyCallback);
     this.updateData.clear();
   }
 
@@ -175,15 +177,7 @@ class App extends Component {
     return (
       <div className={"app" + (footer.darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
         {!user && !initialAuth ? (
-          <div className="signin">
-            <span>You are not authenticated.</span><br/>
-            <span>You need to sign in to use this app.</span><br/>
-            <br/>
-            <Button title="Sign In" onClick={() => firebase.signIn()}>
-              <FontAwesomeIcon icon={faGoogle} className="padRight" />
-              Sign In
-            </Button>
-          </div>
+          <Login /> 
         ) : (
           initialAuth || initialLoad ? (
             <Loader type="Triangle" color="#ccc" height="80" width="80" />
