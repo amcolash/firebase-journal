@@ -3,12 +3,13 @@ import moment from 'moment';
 import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons';
 
 import crypt from '../crypt';
 import firebase from '../firebase';
 
 import Button from './button';
+import Editor from './editor';
 import Footer from './footer';
 import Item from './item';
 import Login from './login';
@@ -21,14 +22,16 @@ class App extends Component {
 
     this.state = {
       itemList: {},
-      itemTitle: '',
-      itemText: '',
-      selected: 0,
-      saved: true,
       initialLoad: true,
       initialAuth: true,
       user: undefined,
       decryptKey: '',
+      item: {
+        selected: 0,
+        itemTitle: '',
+        itemText: '',
+        saved: true,
+      },
       footer: {
         darkMode: true,
         simple: false,
@@ -64,16 +67,19 @@ class App extends Component {
               return b.value.created - a.value.created;
             });
 
-            const selected = Math.min(this.state.selected, itemList.length - 1);
+            const selected = Math.min(this.state.item.selected, itemList.length - 1);
             const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
             const itemText = itemList[selected] ? itemList[selected].value.text : '';
 
             this.setState({
+              initialLoad: false,
               itemList: itemList || [],
-              selected: selected || 0,
-              itemTitle: itemTitle,
-              itemText: itemText,
-              initialLoad: false
+              item: {
+                saved: true,
+                selected: selected || 0,
+                itemTitle: itemTitle,
+                itemText: itemText,
+              }
             });
           });
 
@@ -97,25 +103,27 @@ class App extends Component {
   }
 
   handleTitleChange(e) {
-    const title = crypt.encrypt(e.target.value, this.state.decryptKey);
-    this.setState({itemTitle: title, saved: false});
+    const {decryptKey, item} = this.state;
+    const title = crypt.encrypt(e.target.value, decryptKey);
+    this.setState({ item: {...item, itemTitle: title, saved: false} });
     this.updateData();
   }
 
   handleTextChange(e) {
-    const text = crypt.encrypt(e.target.value, this.state.decryptKey);
-    this.setState({itemText: text, saved: false});
+    const {decryptKey, item} = this.state;
+    const text = crypt.encrypt(e.target.value, decryptKey);
+    this.setState({ item: {...item, itemText: text, saved: false} });
     this.updateData();
   }
   
   updateData = debounce(() => {
-    const { selected, itemList, itemTitle, itemText } = this.state;
-    this.firebaseRef.child(itemList[selected].id).update({
-      title: itemTitle,
-      text: itemText,
+    const { item, itemList } = this.state;
+    this.firebaseRef.child(itemList[item.selected].id).update({
+      title: item.itemTitle,
+      text: item.itemText,
       updated: new Date().getTime()
     }, err => {
-      if (!err) this.setState({saved: true});
+      if (!err) this.setState({ item: {...item, saved: true} });
     });
   }, 1500);
   
@@ -135,7 +143,7 @@ class App extends Component {
       text: crypt.encrypt(text, decryptKey),
     }, err => {
       if (!err) {
-        this.selectItem(Math.max(0, this.state.selected - 1));
+        this.selectItem(Math.max(0, this.state.item.selected - 1));
       }
     });
   }
@@ -146,19 +154,19 @@ class App extends Component {
   }
 
   selectItem(index) {
-    const { selected, itemList, itemText, itemTitle, saved } = this.state;
+    const { item, itemList } = this.state;
 
     // Save unsaved changes on select of new item
     this.updateData.clear();
-    if (!saved) {
-      this.firebaseRef.child(itemList[selected].id).update({
-        title: itemTitle,
-        text: itemText,
+    if (!item.saved) {
+      this.firebaseRef.child(itemList[item.selected].id).update({
+        title: item.itemTitle,
+        text: item.itemText,
         updated: new Date().getTime()
       });
     }
 
-    this.setState({ selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true });
+    this.setState({ item: {selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true} });
   }
 
   toggleFullscreen() {
@@ -170,9 +178,8 @@ class App extends Component {
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, footer, user, initialAuth, decryptKey } = this.state;
-    const itemTitle = user ? crypt.decrypt(this.state.itemTitle, decryptKey) : '';
-    const itemText = user ? crypt.decrypt(this.state.itemText, decryptKey) : '';
+    const { initialLoad, item, itemList, footer, user, initialAuth, decryptKey } = this.state;
+    const itemTitle = (user && decryptKey) ? crypt.decrypt(item.itemTitle, decryptKey) : '';
 
     return (
       <div className={"app" + (footer.darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
@@ -196,13 +203,14 @@ class App extends Component {
                 <Fragment>
                   <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>
                     <div className="dates">
-                      {itemList ? Object.entries(itemList).map(([index, item]) => {
+                      {itemList ? Object.entries(itemList).map(([index, value]) => {
                         index = Number.parseInt(index);
                         return (
                           <Item
-                            index={index} key={index}
-                            selected={selected}
-                            item={item}
+                            index={index}
+                            key={index}
+                            selected={item.selected}
+                            item={value}
                             itemTitle={itemTitle}
                             decryptKey={decryptKey}
                             darkMode={footer.darkMode}
@@ -221,15 +229,13 @@ class App extends Component {
                     />
                   </div>
           
-                  <div className={"column right" + (footer.sidebar ? "" : " expanded") + (footer.simple ? " simple" : "")}>
-                    <div>
-                      <h3>
-                        <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
-                        <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden") + (footer.darkMode ? "" : " specialInverted")} />
-                      </h3>
-                    </div>
-                    <textarea value={itemText} onChange={this.handleTextChange}/>
-                  </div>
+                  <Editor
+                    decryptKey={decryptKey}
+                    item={item}
+                    footer={footer}
+                    handleTextChange={this.handleTextChange}
+                    handleTitleChange={this.handleTitleChange}
+                  />
                 </Fragment>
               )}
     
