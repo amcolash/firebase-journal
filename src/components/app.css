@@ -39,6 +39,14 @@ h3 {
   flex: 0;
 }
 
+input {
+  height: 1.4em;
+  margin-right: 1em;
+  border-radius: 0.2em;
+  border: 0;
+  padding: 0.5em;
+}
+
 /* At the bottom so things cascade properly */
 @media only screen and (max-width: 600px) {
   .left:not(.collapsed) {

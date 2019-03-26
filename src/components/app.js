@@ -14,6 +14,7 @@ import Footer from './footer';
 import ItemList from './itemlist';
 import Login from './login';
 import NoItems from './noitems';
+import SetPassword from './setpassword';
 
 import './app.css';
 
@@ -25,7 +26,7 @@ class App extends Component {
       initialLoad: true,
       initialAuth: true,
       user: undefined,
-      decryptKey: '',
+      decryptKey: undefined,
       itemList: [],
       item: {
         selected: 0,
@@ -55,7 +56,7 @@ class App extends Component {
         this.setState({user: u, initialAuth: false}, () => {
           // Updating the `itemList` local state attribute when the Firebase Realtime Database data
           // under the '/itemList' path changes.
-          this.firebaseRef = firebase.app.database().ref('/itemList');
+          this.firebaseRef = firebase.app.database().ref('/users/' + u.uid + '/itemList');
           this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
             const values = snap.val();
 
@@ -84,10 +85,11 @@ class App extends Component {
             });
           });
 
-          this.keyRef = firebase.app.database().ref('/key');
+          this.keyRef = firebase.app.database().ref('/users/' + u.uid + '/key');
           this.keyCallback = this.keyRef.on('value', (snap) => {
             const val = snap.val();
             if (val) this.setState({ decryptKey: crypt.decrypt(val, u.uid) });
+            else this.setState({decryptKey: undefined});
           });
         });
       } else {
@@ -180,53 +182,58 @@ class App extends Component {
 
   render() {
     const { initialLoad, item, itemList, footer, user, initialAuth, decryptKey } = this.state;
+    const center = (!user || initialAuth || initialLoad || !decryptKey ? " center" : "");
 
     return (
-      <div className={"app" + (footer.darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
+      <div className={"app" + (footer.darkMode ? "" : " inverted") + center}>
         {!user && !initialAuth ? (
           <Login /> 
         ) : (
           initialAuth || initialLoad ? (
             <Loader type="Triangle" color="#ccc" height="80" width="80" />
           ) : (
-            <Fragment>
-              {itemList.length === 0 ? (
-                <NoItems />
-              ) : (
-                <Fragment>
-                  <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>
-                    <ItemList
+            !decryptKey ? (
+              <SetPassword user={user} />
+            ) : (
+              <Fragment>
+                {itemList.length === 0 ? (
+                  <NoItems />
+                ) : (
+                  <Fragment>
+                    <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>
+                      <ItemList
+                        decryptKey={decryptKey}
+                        item={item}
+                        footer={footer}
+                        itemList={itemList}
+                        selectItem={this.selectItem}
+                        deleteItem={this.deleteItem}
+                      />
+
+                      <Footer
+                        footer={footer}
+                        toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
+                        toggleSimpleMode={() => this.setState({ footer: {...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar} })}
+                        toggleFullscreen={this.toggleFullscreen}
+                        toggleSidebar={() => this.setState({ footer: {...footer, sidebar: !footer.sidebar, simple: false} })}
+                      />
+                    </div>
+            
+                    <Editor
                       decryptKey={decryptKey}
                       item={item}
                       footer={footer}
-                      itemList={itemList}
-                      selectItem={this.selectItem}
-                      deleteItem={this.deleteItem}
+                      handleTextChange={this.handleTextChange}
+                      handleTitleChange={this.handleTitleChange}
                     />
-
-                    <Footer
-                      footer={footer}
-                      toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
-                      toggleSimpleMode={() => this.setState({ footer: {...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar} })}
-                      toggleFullscreen={this.toggleFullscreen}
-                      toggleSidebar={() => this.setState({ footer: {...footer, sidebar: !footer.sidebar, simple: false} })}
-                    />
-                  </div>
-          
-                  <Editor
-                    decryptKey={decryptKey}
-                    item={item}
-                    footer={footer}
-                    handleTextChange={this.handleTextChange}
-                    handleTitleChange={this.handleTitleChange}
-                  />
-                </Fragment>
-              )}
-    
-              <Button title="New Item" className={"circle" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
-                <FontAwesomeIcon icon={faPlus}/>
-              </Button>
-            </Fragment>
+                  </Fragment>
+                )}
+      
+                <Button title="New Item" className={"circle" + (itemList.length === 0 ? " glow" : "")} onClick={this.handleCreate}>
+                  <FontAwesomeIcon icon={faPlus}/>
+                </Button>
+              </Fragment>
+            )
           )
         )}
       </div>

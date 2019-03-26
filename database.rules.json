@@ -1,8 +1,10 @@
-// These rules only let me access db when authed
+// Only allow authed users to see their own data
 
 {
-  "rules": {
-    ".read": "auth != null && auth.uid == 'ARGJcuPJCzTFk9XSyYKP9z7ui6z1'",
-    ".write": "auth != null && auth.uid == 'ARGJcuPJCzTFk9XSyYKP9z7ui6z1'"
+  "users": {
+    "$uid": {
+      ".read": "auth != null && auth.uid == $uid",
+      ".write": "auth != null && auth.uid == $uid"
+    }
   }
 }
