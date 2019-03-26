@@ -11,7 +11,7 @@ import firebase from '../firebase';
 import Button from './button';
 import Editor from './editor';
 import Footer from './footer';
-import Item from './item';
+import ItemList from './itemlist';
 import Login from './login';
 
 import './app.css';
@@ -179,7 +179,6 @@ class App extends Component {
 
   render() {
     const { initialLoad, item, itemList, footer, user, initialAuth, decryptKey } = this.state;
-    const itemTitle = (user && decryptKey) ? crypt.decrypt(item.itemTitle, decryptKey) : '';
 
     return (
       <div className={"app" + (footer.darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
@@ -202,24 +201,15 @@ class App extends Component {
               ) : (
                 <Fragment>
                   <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>
-                    <div className="dates">
-                      {itemList ? Object.entries(itemList).map(([index, value]) => {
-                        index = Number.parseInt(index);
-                        return (
-                          <Item
-                            index={index}
-                            key={index}
-                            selected={item.selected}
-                            item={value}
-                            itemTitle={itemTitle}
-                            decryptKey={decryptKey}
-                            darkMode={footer.darkMode}
-                            selectItem={this.selectItem}
-                            deleteItem={this.deleteItem}
-                          />
-                        )
-                      }) : null}
-                    </div>
+                    <ItemList
+                      decryptKey={decryptKey}
+                      item={item}
+                      footer={footer}
+                      itemList={itemList}
+                      selectItem={this.selectItem}
+                      deleteItem={this.deleteItem}
+                    />
+
                     <Footer
                       footer={footer}
                       toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
