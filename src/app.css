@@ -2,7 +2,7 @@ h3 {
   margin: 0.5em;
 }
 
-.App {
+.app {
   background-color: #282828;
   text-align: center;
   display: flex;
@@ -124,54 +124,13 @@ h3 {
   height: calc(100vh - 3em);
 }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 14.25em;
-  display: flex;
-  border-top: 1px solid #555;
-  padding: 0.25em 0;
-  transition: all 0.5s;
-}
-
-.footer.collapsed {
-  width: 0;
-}
-
-.footer.collapsed .button {
-  opacity: 0.25;
-}
-
-.footer.collapsed .button:hover {
-  opacity: 0.6;
-}
-
-.spacer {
-  flex-grow: 1;
-  padding-left: 0.5em;
-  transition: all 0.5s;
-}
-
 /* At the bottom so things cascade properly */
 @media only screen and (max-width: 600px) {
-  .footer {
-    border-top-color: rgba(0,0,0,0);
-  }
-
   .left:not(.collapsed) {
     flex: 1 0 100%;
   }
 
-  .footer:not(.collapsed) {
-    width: 100%;
-  }
-
   .right:not(.expanded) textarea {
     overflow: hidden;
-  }
-
-  .spacer {
-    flex-grow: 0;
   }
 }

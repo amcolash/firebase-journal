@@ -1,0 +1,42 @@
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 14.25em;
+  display: flex;
+  border-top: 1px solid #555;
+  padding: 0.25em 0;
+  transition: all 0.5s;
+}
+
+.footer.collapsed {
+  width: 0;
+}
+
+.footer.collapsed .button {
+  opacity: 0.25;
+}
+
+.footer.collapsed .button:hover {
+  opacity: 0.6;
+}
+
+.spacer {
+  flex-grow: 1;
+  padding-left: 0.5em;
+  transition: all 0.5s;
+}
+
+@media only screen and (max-width: 600px) {
+  .footer {
+    border-top-color: rgba(0,0,0,0);
+  }
+
+  .footer:not(.collapsed) {
+    width: 100%;
+  }
+
+  .spacer {
+    flex-grow: 0;
+  }
+}

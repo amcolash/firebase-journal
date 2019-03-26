@@ -3,16 +3,16 @@ import moment from 'moment';
 import Loader from 'react-loader-spinner';
 import { debounce } from 'debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDoubleLeft, faAngleDoubleRight, faCheck, faExpandArrowsAlt, faCompressArrowsAlt, faLongArrowAltDown,
-  faMoon, faPlus, faSignOutAlt, faEye } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faPlus, faLongArrowAltDown } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 
 import crypt from './crypt';
 import firebase from './firebase.js';
+import Button from './button';
+import Footer from './footer';
+import Item from './item';
 
 import './app.css';
-import Button from './button';
-import Item from './item';
 
 class App extends Component {
   constructor(props) {
@@ -25,13 +25,15 @@ class App extends Component {
       selected: 0,
       saved: true,
       initialLoad: true,
-      darkMode: true,
-      simple: false,
-      fullscreen: false,
-      sidebar: true,
       initialAuth: true,
       user: undefined,
-      decryptKey: ''
+      decryptKey: '',
+      footer: {
+        darkMode: true,
+        simple: false,
+        fullscreen: false,
+        sidebar: true,
+      }
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -39,45 +41,46 @@ class App extends Component {
     this.handleCreate = this.handleCreate.bind(this);
     this.selectItem = this.selectItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
+    this.toggleFullscreen = this.toggleFullscreen.bind(this);
   }
   
   componentDidMount() {
     firebase.app.auth().onAuthStateChanged(u => {
       if (u) {
-        this.setState({user: u, initialAuth: false});
+        this.setState({user: u, initialAuth: false}, () => {
+          // Updating the `itemList` local state attribute when the Firebase Realtime Database data
+          // under the '/itemList' path changes.
+          this.firebaseRef = firebase.app.database().ref('/itemList');
+          this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
+            const values = snap.val();
 
-        // Updating the `itemList` local state attribute when the Firebase Realtime Database data
-        // under the '/itemList' path changes.
-        this.firebaseRef = firebase.app.database().ref('/itemList');
-        this.firebaseCallback = this.firebaseRef.on('value', (snap) => {
-          const values = snap.val();
+            if (!values) {
+              this.setState({itemList: [], initialLoad: false});
+              return;
+            }
 
-          if (!values) {
-            this.setState({itemList: [], initialLoad: false});
-            return;
-          }
+            const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
+              return b.value.created - a.value.created;
+            });
 
-          const itemList = Object.entries(snap.val()).map(([key, value]) => { return {id: key, value: value}; }).sort((a, b) => {
-            return b.value.created - a.value.created;
+            const selected = Math.min(this.state.selected, itemList.length - 1);
+            const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
+            const itemText = itemList[selected] ? itemList[selected].value.text : '';
+
+            this.setState({
+              itemList: itemList || [],
+              selected: selected || 0,
+              itemTitle: itemTitle,
+              itemText: itemText,
+              initialLoad: false
+            });
           });
 
-          const selected = Math.min(this.state.selected, itemList.length - 1);
-          const itemTitle = itemList[selected] ? itemList[selected].value.title : '';
-          const itemText = itemList[selected] ? itemList[selected].value.text : '';
-
-          this.setState({
-            itemList: itemList || [],
-            selected: selected || 0,
-            itemTitle: itemTitle || '',
-            itemText: itemText || '',
-            initialLoad: false
+          var key = firebase.app.database().ref('/key');
+          key.on('value', (snap) => {
+            const val = snap.val();
+            if (val) this.setState({ decryptKey: crypt.decrypt(val, u.uid) });
           });
-        });
-
-        var key = firebase.app.database().ref('/key');
-        key.on('value', (snap) => {
-          const val = snap.val();
-          if (val) this.setState({ decryptKey: crypt.decrypt(val, u.uid) });
         });
       } else {
         this.setState({user: undefined, initialAuth: false});
@@ -153,16 +156,24 @@ class App extends Component {
       });
     }
 
-    this.setState({selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true});
+    this.setState({ selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true });
+  }
+
+  toggleFullscreen() {
+    const footer = this.state.footer;
+    if (footer.fullscreen) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+
+    this.setState({ footer: {...footer, fullscreen: !footer.fullscreen} });
   }
 
   render() {
-    const { initialLoad, saved, selected, itemList, darkMode, fullscreen, sidebar, user, initialAuth, decryptKey, simple } = this.state;
+    const { initialLoad, saved, selected, itemList, footer, user, initialAuth, decryptKey } = this.state;
     const itemTitle = user ? crypt.decrypt(this.state.itemTitle, decryptKey) : '';
     const itemText = user ? crypt.decrypt(this.state.itemText, decryptKey) : '';
 
     return (
-      <div className={"App" + (darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
+      <div className={"app" + (footer.darkMode ? "" : " inverted") + (!user || initialAuth || initialLoad ? " center" : "")}>
         {!user && !initialAuth ? (
           <div className="signin">
             <span>You are not authenticated.</span><br/>
@@ -189,67 +200,38 @@ class App extends Component {
                 </div>
               ) : (
                 <Fragment>
-                  <div className={"column left" + (sidebar ? "" : " collapsed")}>
+                  <div className={"column left" + (footer.sidebar ? "" : " collapsed")}>
                     <div className="dates">
                       {itemList ? Object.entries(itemList).map(([index, item]) => {
                         index = Number.parseInt(index);
                         return (
                           <Item
-                            index={index}
-                            key={index}
+                            index={index} key={index}
                             selected={selected}
                             item={item}
                             itemTitle={itemTitle}
                             decryptKey={decryptKey}
-                            darkMode={darkMode}
+                            darkMode={footer.darkMode}
                             selectItem={this.selectItem}
                             deleteItem={this.deleteItem}
                           />
                         )
                       }) : null}
                     </div>
-                    <div className={"footer" + (!sidebar ? " collapsed" : "")}>
-                      <Button title="Sign Out" onClick={() => firebase.app.auth().signOut()}>
-                        <FontAwesomeIcon icon={faSignOutAlt}/>
-                      </Button>
-
-                      <div className="spacer"></div>
-
-                      <Button title="Toggle Dark Mode" selected={darkMode} onClick={() => this.setState({darkMode: !darkMode})}>
-                        <FontAwesomeIcon icon={faMoon}/>
-                      </Button>
-
-                      <Button title="Toggle Simple Mode" selected={simple} onClick={() => {
-                        var newSidebar = !simple ? false : sidebar;
-                        this.setState({simple: !simple, sidebar: newSidebar})}
-                      }>
-                        <FontAwesomeIcon icon={faEye}/>
-                      </Button>
-
-                      <Button title="Toggle Full Screen" selected={fullscreen} onClick={() => {
-                        if (fullscreen) {
-                          document.exitFullscreen();
-                        } else {
-                          document.documentElement.requestFullscreen();
-                        }
-
-                        this.setState({fullscreen: !fullscreen});
-                      }}>
-                        <FontAwesomeIcon icon={fullscreen ? faCompressArrowsAlt : faExpandArrowsAlt}/>
-                      </Button>
-
-                      <div className="spacer"></div>
-                      <Button title="Toggle Sidebar" onClick={() => this.setState({sidebar: !sidebar, simple: false})}>
-                        <FontAwesomeIcon icon={sidebar ? faAngleDoubleLeft : faAngleDoubleRight}/>
-                      </Button>
-                    </div>
+                    <Footer
+                      footer={footer}
+                      toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
+                      toggleSimpleMode={() => this.setState({ footer: {...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar} })}
+                      toggleFullscreen={this.toggleFullscreen}
+                      toggleSidebar={() => this.setState({ footer: {...footer, sidebar: !footer.sidebar, simple: false} })}
+                    />
                   </div>
           
-                  <div className={"column right" + (sidebar ? "" : " expanded") + (simple ? " simple" : "")}>
+                  <div className={"column right" + (footer.sidebar ? "" : " expanded") + (footer.simple ? " simple" : "")}>
                     <div>
                       <h3>
                         <input className="title" type="text" value={itemTitle} onChange={this.handleTitleChange}/>
-                        <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden") + (darkMode ? "" : " specialInverted")} />
+                        <FontAwesomeIcon icon={faCheck} className={"saved" + (saved ? "" : " hidden") + (footer.darkMode ? "" : " specialInverted")} />
                       </h3>
                     </div>
                     <textarea value={itemText} onChange={this.handleTextChange}/>
