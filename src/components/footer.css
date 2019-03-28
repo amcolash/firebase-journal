@@ -44,3 +44,9 @@
     display: none;
   }
 }
+
+@media only screen and (max-height: 200px) {
+  .footer {
+    opacity: 0;
+  }
+}

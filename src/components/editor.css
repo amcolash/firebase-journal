@@ -28,6 +28,8 @@
   width: 100%;
   border: 0;
   resize: none;
+  margin-bottom: 0;
+  transition: all 0.3s;
 }
 
 .title {
@@ -60,5 +62,18 @@
 @media only screen and (max-width: 600px) {
   .right:not(.expanded) textarea {
     overflow: hidden;
+  }
+}
+
+@media only screen and (max-height: 500px) {
+  .right textarea {
+    padding-bottom: 0;
+    margin-bottom: calc(3.5em + .35vw);
+  }
+}
+
+@media only screen and (max-height: 200px) {
+  .right textarea {
+    margin-bottom: 0;
   }
 }
