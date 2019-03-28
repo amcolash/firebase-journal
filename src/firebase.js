@@ -17,7 +17,7 @@ const app = firebase.initializeApp(config);
 
 function signIn() {
   app.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => {
-    app.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(result => {
+    app.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider()).then(result => {
       // This gives you a Google Access Token. You can use it to access the Google API.
       // var token = result.credential.accessToken;
 
