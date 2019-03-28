@@ -52,3 +52,9 @@
   background-color: white;
   color: #222;
 }
+
+@media only screen and (max-height: 200px) {
+  .circle {
+    opacity: 0;
+  }
+}
