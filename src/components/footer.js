@@ -9,6 +9,10 @@ import Button from './button';
 import './footer.css';
 
 class Footer extends Component {
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevProps.footer.simple && this.props.footer.simple && document.fullscreenElement === null) this.props.toggleFullscreen();
+  }
+
   render() {
     const { footer, toggleDarkMode, toggleSimpleMode, toggleFullscreen, toggleSidebar } = this.props;
 
