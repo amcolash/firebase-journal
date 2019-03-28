@@ -7,6 +7,12 @@ import crypt from '../crypt';
 import './editor.css';
 
 class Editor extends Component {
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.item.focused) {
+      this.textBox.focus();
+    }
+  }
+
   render() {
     const {footer, item, decryptKey, handleTextChange, handleTitleChange} = this.props;
 
@@ -21,7 +27,7 @@ class Editor extends Component {
             <FontAwesomeIcon icon={faCheck} className={"saved" + (item.saved ? "" : " hidden") + (footer.darkMode ? "" : " specialInverted")} />
           </h3>
         </div>
-        <textarea value={itemText} onChange={handleTextChange}/>
+        <textarea value={itemText} onChange={handleTextChange} autoFocus ref={(input) => { this.textBox = input; }} />
       </div>
     );
   }

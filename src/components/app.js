@@ -33,6 +33,7 @@ class App extends Component {
         itemTitle: '',
         itemText: '',
         saved: true,
+        focused: false
       },
       footer: {
         darkMode: true,
@@ -105,6 +106,10 @@ class App extends Component {
     this.updateData.clear();
   }
 
+  isMobile() {
+    return window.innerWidth < 600;
+  }
+
   handleTitleChange(e) {
     const {decryptKey, item} = this.state;
     const title = crypt.encrypt(e.target.value, decryptKey);
@@ -115,7 +120,7 @@ class App extends Component {
   handleTextChange(e) {
     const {decryptKey, item} = this.state;
     const text = crypt.encrypt(e.target.value, decryptKey);
-    this.setState({ item: {...item, itemText: text, saved: false} });
+    this.setState({ item: {...item, itemText: text, saved: false, focused: false} });
     this.updateData();
   }
   
@@ -146,7 +151,11 @@ class App extends Component {
       text: crypt.encrypt(text, decryptKey),
     }, err => {
       if (!err) {
-        this.selectItem(Math.max(0, this.state.item.selected - 1));
+        const { footer, item } = this.state;
+        this.selectItem(Math.max(0, item.selected - 1));
+        if (this.isMobile()) {
+          this.setState({footer: {...footer, sidebar: false}});
+        }
       }
     });
   }
@@ -169,7 +178,7 @@ class App extends Component {
       });
     }
 
-    this.setState({ item: {selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true} });
+    this.setState({ item: {selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true, focused: true} });
   }
 
   toggleFullscreen() {
