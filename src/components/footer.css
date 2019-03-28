@@ -46,7 +46,7 @@
 }
 
 @media only screen and (max-height: 200px) {
-  .footer {
+  .footer.collapsed {
     opacity: 0;
   }
 }
