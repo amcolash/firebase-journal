@@ -53,7 +53,7 @@
   color: #222;
 }
 
-@media only screen and (max-height: 200px) {
+@media only screen and (orientation: landscape) and (max-height: 200px) {
   .circle {
     opacity: 0;
   }

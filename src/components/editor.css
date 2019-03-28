@@ -63,16 +63,19 @@
   .right:not(.expanded) textarea {
     overflow: hidden;
   }
-}
 
-@media only screen and (max-height: 500px) {
   .right textarea {
     padding-bottom: 0;
+  }
+}
+
+@media only screen and (orientation: portrait) and (max-height: 500px) {
+  .right textarea {
     margin-bottom: calc(3.5em + .35vw);
   }
 }
 
-@media only screen and (max-height: 200px) {
+@media only screen and (orientation: landscape) and (max-height: 200px) {
   .right textarea {
     margin-bottom: 0;
   }

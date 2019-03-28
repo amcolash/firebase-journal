@@ -45,7 +45,7 @@
   }
 }
 
-@media only screen and (max-height: 200px) {
+@media only screen and (orientation: landscape) and (max-height: 200px) {
   .footer.collapsed {
     opacity: 0;
   }
