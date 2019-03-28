@@ -14,7 +14,7 @@ class Editor extends Component {
   }
 
   render() {
-    const {footer, item, decryptKey, handleTextChange, handleTitleChange} = this.props;
+    const {footer, item, decryptKey, handleTextChange, handleTitleChange, isMobile} = this.props;
 
     const itemTitle = decryptKey ? crypt.decrypt(item.itemTitle, decryptKey) : '';
     const itemText = decryptKey ? crypt.decrypt(item.itemText, decryptKey) : '';
@@ -27,7 +27,7 @@ class Editor extends Component {
             <FontAwesomeIcon icon={faCheck} className={"saved" + (item.saved ? "" : " hidden") + (footer.darkMode ? "" : " specialInverted")} />
           </h3>
         </div>
-        <textarea value={itemText} onChange={handleTextChange} autoFocus ref={(input) => { this.textBox = input; }} />
+        <textarea value={itemText} onChange={handleTextChange} autoFocus={!isMobile()} ref={(input) => { this.textBox = input; }} />
       </div>
     );
   }

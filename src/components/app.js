@@ -234,6 +234,7 @@ class App extends Component {
                       footer={footer}
                       handleTextChange={this.handleTextChange}
                       handleTitleChange={this.handleTitleChange}
+                      isMobile={this.isMobile}
                     />
                   </Fragment>
                 )}
