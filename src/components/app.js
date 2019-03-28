@@ -166,7 +166,7 @@ class App extends Component {
   }
 
   selectItem(index) {
-    const { item, itemList } = this.state;
+    const { footer, item, itemList } = this.state;
 
     // Save unsaved changes on select of new item
     this.updateData.clear();
@@ -178,7 +178,10 @@ class App extends Component {
       });
     }
 
-    this.setState({ item: {selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true, focused: true} });
+    this.setState({
+      item: {selected: index, itemText: itemList[index].value.text, itemTitle: itemList[index].value.title, saved: true, focused: true},
+      footer: {...footer, sidebar: !this.isMobile() && footer.sidebar}
+    });
   }
 
   toggleFullscreen() {
