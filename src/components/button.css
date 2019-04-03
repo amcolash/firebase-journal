@@ -58,3 +58,10 @@
     opacity: 0;
   }
 }
+
+@media only screen and (max-height: 500px) and (orientation: portrait) {
+  .circle {
+    bottom: 0.1em;
+    right: 0.5em;
+  }
+}

@@ -143,7 +143,7 @@ class App extends Component {
     // Add the new item to Firebase.
     const now = new Date();
     const title = moment(now).format('M/D/YYYY, h:mm A');
-    const text = '...';
+    const text = '';
     this.firebaseRef.push({
       created: now.getTime(),
       updated: now.getTime(),
