@@ -75,8 +75,9 @@
   }
 }
 
-@media only screen and (orientation: landscape) and (max-height: 200px) {
+@media only screen and (orientation: landscape) and (max-height: 420px) {
   .right textarea {
-    margin-bottom: 0;
+    margin-bottom: calc(3.5em + .35vw);
+    padding-bottom: 0.75em;
   }
 }

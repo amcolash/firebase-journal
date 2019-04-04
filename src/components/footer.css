@@ -40,7 +40,13 @@
     flex-grow: 0;
   }
 
-  .simpleMode {
+  .simpleMode, .fullscreenMode {
+    display: none;
+  }
+}
+
+@media only screen and (orientation: landscape) and (max-height: 420px) {
+  .fullscreenMode {
     display: none;
   }
 }

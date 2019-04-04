@@ -10,7 +10,7 @@ import './footer.css';
 
 class Footer extends Component {
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.footer.simple && this.props.footer.simple && document.fullscreenElement === null) this.props.toggleFullscreen();
+    if (!prevProps.footer.simple && this.props.footer.simple && document.fullscreenElement === null && window.innerWidth < 600) this.props.toggleFullscreen();
   }
 
   render() {
@@ -32,7 +32,7 @@ class Footer extends Component {
           <FontAwesomeIcon icon={faEye}/>
         </Button>
 
-        <Button title="Toggle Full Screen" selected={footer.fullscreen} onClick={toggleFullscreen}>
+        <Button title="Toggle Full Screen" className="fullscreenMode" selected={footer.fullscreen} onClick={toggleFullscreen}>
           <FontAwesomeIcon icon={footer.fullscreen ? faCompressArrowsAlt : faExpandArrowsAlt}/>
         </Button>
 

@@ -8,7 +8,7 @@ class Button extends Component {
 
     return (
       <button
-        className={"button " + className + (selected ? " selected" : "")}
+        className={"button " + (className || "") + (selected ? " selected" : "")}
         onClick={onClick}
         title={title}
       >{children}</button>
