@@ -20,7 +20,7 @@ class Item extends Component {
           <span className="updated">{moment(item.value.updated).fromNow()}</span>
         </Button>
 
-        <Button title="Delete" className={"delete" + (darkMode ? "" : " inverted")} onClick={() => deleteItem(item.id)}>
+        <Button title="Delete" className={"delete" + (darkMode ? "" : " inverted")} onClick={() => deleteItem(item)}>
           <FontAwesomeIcon icon={faTrash} />
         </Button>
       </div>

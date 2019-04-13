@@ -113,7 +113,7 @@ class App extends Component {
   handleTitleChange(e) {
     const {decryptKey, item} = this.state;
     const title = crypt.encrypt(e.target.value, decryptKey);
-    this.setState({ item: {...item, itemTitle: title, saved: false} });
+    this.setState({ item: {...item, itemTitle: title, saved: false, focused: false} });
     this.updateData();
   }
 
@@ -160,9 +160,10 @@ class App extends Component {
     });
   }
 
-  deleteItem(id) {
-    var del = window.confirm('Are you sure you want to delete this note?');
-    if (del) this.firebaseRef.child(id).remove();
+  deleteItem(item) {
+    const title = crypt.decrypt(item.value.title, this.state.decryptKey);
+    const del = window.confirm('Are you sure you want to delete the note\n"' + title + '" ?');
+    if (del) this.firebaseRef.child(item.id).remove();
   }
 
   selectItem(index) {
@@ -225,7 +226,10 @@ class App extends Component {
                       <Footer
                         footer={footer}
                         toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
-                        toggleSimpleMode={() => this.setState({ footer: {...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar} })}
+                        toggleSimpleMode={() => {
+                          this.setState({ footer: { ...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar }});
+                          if (!this.isMobile() && !footer.fullscreen) this.toggleFullscreen();
+                        }}
                         toggleFullscreen={this.toggleFullscreen}
                         toggleSidebar={() => this.setState({ footer: {...footer, sidebar: !footer.sidebar, simple: false} })}
                       />

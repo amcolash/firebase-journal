@@ -27,7 +27,7 @@ class Editor extends Component {
             <FontAwesomeIcon icon={faCheck} className={"saved" + (item.saved ? "" : " hidden") + (footer.darkMode ? "" : " specialInverted")} />
           </h3>
         </div>
-        <textarea value={itemText} onChange={handleTextChange} autoFocus={!isMobile()} ref={(input) => { this.textBox = input; }} />
+        <textarea value={itemText} onChange={handleTextChange} autoFocus={!isMobile()} ref={input => this.textBox = input } />
       </div>
     );
   }
