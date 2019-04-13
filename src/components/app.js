@@ -227,8 +227,9 @@ class App extends Component {
                         footer={footer}
                         toggleDarkMode={() => this.setState({ footer: {...footer, darkMode: !footer.darkMode} })}
                         toggleSimpleMode={() => {
-                          this.setState({ footer: { ...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar }});
-                          if (!this.isMobile() && !footer.fullscreen) this.toggleFullscreen();
+                          this.setState({ footer: { ...footer, simple: !footer.simple, sidebar: !footer.simple ? false : footer.sidebar }}, () => {
+                            if (!this.isMobile() && !footer.fullscreen) this.toggleFullscreen();
+                          });
                         }}
                         toggleFullscreen={this.toggleFullscreen}
                         toggleSidebar={() => this.setState({ footer: {...footer, sidebar: !footer.sidebar, simple: false} })}
